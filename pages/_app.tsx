@@ -4,10 +4,17 @@ import "@/styles/custom.scss";
 import type { AppProps } from "next/app";
 import { SSRProvider } from "react-bootstrap";
 
-export default function App({ Component, pageProps }: AppProps) {
+import AuthProvider from "../context/AuthContext";
+import ProtectedRoute from "../context/ProtectedRoute";
+
+export default function App({ Component, pageProps, router }: AppProps) {
   return (
     <SSRProvider>
-      <Component {...pageProps} />
+      <AuthProvider>
+        <ProtectedRoute router={router}>
+          <Component {...pageProps} />
+        </ProtectedRoute>
+      </AuthProvider>
     </SSRProvider>
   );
 }

@@ -1,12 +1,11 @@
 # Toket Demo App
 
-This demo app generates NFTs using OpenApi Dalle2 API and Toket API. Check out the [live demo](https://demo.toket.io/) and feel free to provide feedback or contribute.
+This demo app generates NFTs using the Toket API. Check out the [live demo](https://demo.toket.io/) and feel free to provide feedback or contribute.
 
 ## Getting Started
 
 ### Requirements
 
-- OpenApi API key
 - Toket API key
 
 ### Before you begin
