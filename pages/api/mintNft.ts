@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-const QSTASH = `https://qstash.upstash.io/v1/publish/`;
-const DALL_E = "https://api.openai.com/v1/images/generations";
-const VERCEL_URL = "https://dalle-2.vercel.app";
+const TOKET_URL = "https://toket-public-gateway-sf3wxt4.uc.gateway.dev/v0/easyMint";
 import rateLimit from "../../utils/rate-limit";
 
 const limiter = rateLimit({
@@ -13,8 +11,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { prompt } = req.query;
-  console.log("*AC received api call: ", prompt);
+  const { name, description, wallet, imageUrl, prompt } = req.body
 
   try {
     // Check if the user has exceeded maximum number of requests per minute
@@ -27,24 +24,32 @@ export default async function handler(
       });
     });
 
-    const responseDalle = await fetch(DALL_E, {
+    const body = {
+      "mintToAddress": wallet,
+      "name": name,
+      "description": description,
+      "imageUrl": imageUrl,
+      "attributes": [
+        {
+          "traitType": "Prompt",
+          "value": prompt
+        }
+      ]
+    }
+
+    const response = await fetch(TOKET_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "x-public-key": process.env.TOKET_PUBLIC_KEY,
+        "x-api-key": process.env.TOKET_API_KEY,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        prompt,
-        n: 1,
-        size: "512x512",
-      }),
+      body: JSON.stringify(body),
     });
-    const json = await responseDalle.json();
+    const json = await response.json();
     console.log("*AC json response: ", json);
 
-    return res.status(202).json(json);
-
-
+    return res.status(200).json(json);
 
   } catch (error) {
     return res
