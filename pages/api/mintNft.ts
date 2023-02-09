@@ -11,7 +11,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { name, description, wallet, imageUrl, prompt } = req.body
+  const { name, description, wallet, imageUrl } = req.body
 
   try {
     // Check if the user has exceeded maximum number of requests per minute
@@ -29,12 +29,6 @@ export default async function handler(
       "name": name,
       "description": description,
       "imageUrl": imageUrl,
-      "attributes": [
-        {
-          "traitType": "Prompt",
-          "value": prompt
-        }
-      ]
     }
 
     const response = await fetch(TOKET_URL, {

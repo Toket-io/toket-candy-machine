@@ -21,26 +21,10 @@ export const firebaseSignInAnonymously = signInAnonymously;
 
 // STORAGE
 const storage = getStorage();
-export const firebaseUploadNewBytes = async (path, uri) => {
+export const firebaseUploadNewBytes = async (path, file) => {
   try {
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function (e) {
-        reject(new TypeError("Network request failed"));
-      };
-      xhr.responseType = "blob";
-      xhr.open("GET", uri, true);
-      xhr.send(null);
-    });
-
     const fileRef = ref(storage, path);
-    const result = await uploadBytes(fileRef, blob);
-
-    // We're done with the blob, close and release it
-    blob.close();
+    const result = await uploadBytes(fileRef, file);
 
     return await getDownloadURL(fileRef);
   } catch (error) {

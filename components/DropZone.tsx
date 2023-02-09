@@ -29,7 +29,6 @@ const rejectStyle = {
 };
 
 export type DropZoneProps = {
-  loading: boolean;
   file: File | null;
   onUpload: (result: File, url: string) => void;
 };

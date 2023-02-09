@@ -13,8 +13,8 @@ import DropZone from "@/components/DropZone";
 import { firebaseUploadNewBytes } from "@/api/firebase";
 
 export default function Home() {
-  const [loading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
   const [mintLoading, setMintLoading] = useState(false);
   const [canShowImage, setCanShowImage] = useState(false);
   const [mintId, setMintId] = useState(null);
@@ -40,33 +40,50 @@ export default function Home() {
   const formSubmit = async (formValue) => {
     const { file, name, description, wallet } = formValue;
 
-    toast("Uploading image...", { position: "top-center" });
-
-    setLoading(true);
+    setMintLoading(true);
 
     // Reset mint state
     setTransactionHash(null);
     setMintId(null);
 
-    // Reset image state
-    // setImage(null);
-    setCanShowImage(false);
-
-    setLoading(true);
-    toast("Generating your image...", { position: "top-center" });
-
     try {
-      const response = await fetch(`/api/image?prompt=${prompt}`);
+      if (!uploadedImageUrl) {
+        toast("Uploading image...", { position: "top-center" });
+        const imageUrl = await firebaseUploadNewBytes(
+          `images/${file.name}`,
+          file
+        );
+        setUploadedImageUrl(imageUrl);
+      }
+
+      toast("Minting your NFT...", { position: "top-center" });
+      const url = "/api/mintNft";
+      const data = {
+        name,
+        description,
+        wallet,
+        imageUrl: uploadedImageUrl,
+      };
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
       const json = await response.json();
 
-      if (response.status === 202) {
-        console.log("*AC jsonData: ", json.data[0].url);
-        setLoading(false);
-        // setImage(json.data[0].url);
+      if (response.status === 200) {
+        console.log("*AC jsonData: ", json);
+        setMintId(json.id);
       }
     } catch (error) {
+      console.log("error: ", error);
       toast.error("Something went wrong...", { position: "top-center" });
     }
+    setMintLoading(false);
   };
 
   // async function mintNft(result: React.FormEventHandler) {
@@ -113,8 +130,6 @@ export default function Home() {
 
   //   setMintLoading(false);
   // }
-
-  const showLoadingState = loading || (image && !canShowImage);
 
   return (
     <>
@@ -170,7 +185,6 @@ export default function Home() {
                               />
                             ) : (
                               <DropZone
-                                loading={loading}
                                 file={values.file}
                                 onUpload={(uploadedFile, url) => {
                                   setFieldValue("file", uploadedFile);
@@ -216,7 +230,7 @@ export default function Home() {
             </Formik>
           </div>
 
-          {1 == 1 && (
+          {mintId && (
             <PendingTransaction
               id={mintId ?? ""}
               transactionHash={transactionHash}
