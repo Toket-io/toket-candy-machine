@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "toket-staging"
+    "default": "toket-demo-af390"
   },
   "targets": {
     "toket-staging": {
