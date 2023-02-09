@@ -46,6 +46,7 @@ export default function Home() {
     setTransactionHash(null);
     setMintId(null);
 
+    var safeUrl: string | undefined | null = uploadedImageUrl || null;
     try {
       if (!uploadedImageUrl) {
         toast("Uploading image...", { position: "top-center" });
@@ -53,6 +54,7 @@ export default function Home() {
           `images/${file.name}`,
           file
         );
+        safeUrl = imageUrl;
         setUploadedImageUrl(imageUrl);
       }
 
@@ -62,7 +64,7 @@ export default function Home() {
         name,
         description,
         wallet,
-        imageUrl: uploadedImageUrl,
+        imageUrl: safeUrl,
       };
 
       const response = await fetch(url, {
@@ -85,51 +87,6 @@ export default function Home() {
     }
     setMintLoading(false);
   };
-
-  // async function mintNft(result: React.FormEventHandler) {
-  //   toast("Minting your NFT...", { position: "top-center" });
-  //   // setMintLoading(true);
-
-  //   const { name, description, wallet } = result;
-
-  //   console.log("name: ", name);
-  //   console.log("description: ", description);
-  //   console.log("wallet: ", wallet);
-
-  //   // Reset mint state
-  //   setTransactionHash(null);
-  //   setMintId(null);
-
-  //   const url = "/api/mintNft";
-  //   const data = {
-  //     name,
-  //     description,
-  //     wallet,
-  //     imageUrl: image,
-  //     prompt,
-  //   };
-
-  //   try {
-  //     const response = await fetch(url, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(data),
-  //     });
-
-  //     const json = await response.json();
-
-  //     if (response.status === 200) {
-  //       console.log("*AC jsonData: ", json);
-  //       setMintId(json.id);
-  //     }
-  //   } catch (error) {
-  //     toast.error("Something went wrong...", { position: "top-center" });
-  //   }
-
-  //   setMintLoading(false);
-  // }
 
   return (
     <>
