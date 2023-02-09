@@ -9,9 +9,10 @@ import { Button, Col, Form, InputGroup, Row, Spinner } from "react-bootstrap";
 import { useInterval } from "../utils/use-interval";
 import MintForm, { MintFormResult } from "../components/MintForm";
 import PendingTransaction from "../components/PendingTransaction";
+import DropZone from "@/components/DropZone";
+import { firebaseUploadNewBytes } from "@/api/firebase";
 
 export default function Home() {
-  const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
   const [mintLoading, setMintLoading] = useState(false);
@@ -36,17 +37,19 @@ export default function Home() {
     mintId && !transactionHash ? 1000 : null
   );
 
-  const generateSubmit = async (formValue) => {
-    const { prompt } = formValue;
+  const formSubmit = async (formValue) => {
+    const { file, name, description, wallet } = formValue;
 
-    setPrompt(prompt);
+    toast("Uploading image...", { position: "top-center" });
+
+    setLoading(true);
 
     // Reset mint state
     setTransactionHash(null);
     setMintId(null);
 
     // Reset image state
-    setImage(null);
+    // setImage(null);
     setCanShowImage(false);
 
     setLoading(true);
@@ -59,60 +62,64 @@ export default function Home() {
       if (response.status === 202) {
         console.log("*AC jsonData: ", json.data[0].url);
         setLoading(false);
-        setImage(json.data[0].url);
+        // setImage(json.data[0].url);
       }
     } catch (error) {
       toast.error("Something went wrong...", { position: "top-center" });
     }
   };
 
-  async function mintNft(result: MintFormResult) {
-    toast("Minting your NFT...", { position: "top-center" });
-    setMintLoading(true);
+  // async function mintNft(result: React.FormEventHandler) {
+  //   toast("Minting your NFT...", { position: "top-center" });
+  //   // setMintLoading(true);
 
-    const { name, description, wallet } = result;
+  //   const { name, description, wallet } = result;
 
-    // Reset mint state
-    setTransactionHash(null);
-    setMintId(null);
+  //   console.log("name: ", name);
+  //   console.log("description: ", description);
+  //   console.log("wallet: ", wallet);
 
-    const url = "/api/mintNft";
-    const data = {
-      name,
-      description,
-      wallet,
-      imageUrl: image,
-      prompt,
-    };
+  //   // Reset mint state
+  //   setTransactionHash(null);
+  //   setMintId(null);
 
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+  //   const url = "/api/mintNft";
+  //   const data = {
+  //     name,
+  //     description,
+  //     wallet,
+  //     imageUrl: image,
+  //     prompt,
+  //   };
 
-      const json = await response.json();
+  //   try {
+  //     const response = await fetch(url, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(data),
+  //     });
 
-      if (response.status === 200) {
-        console.log("*AC jsonData: ", json);
-        setMintId(json.id);
-      }
-    } catch (error) {
-      toast.error("Something went wrong...", { position: "top-center" });
-    }
+  //     const json = await response.json();
 
-    setMintLoading(false);
-  }
+  //     if (response.status === 200) {
+  //       console.log("*AC jsonData: ", json);
+  //       setMintId(json.id);
+  //     }
+  //   } catch (error) {
+  //     toast.error("Something went wrong...", { position: "top-center" });
+  //   }
+
+  //   setMintLoading(false);
+  // }
 
   const showLoadingState = loading || (image && !canShowImage);
 
   return (
     <>
       <Head>
-        <title>Toket & Dall-E AI NFT Generator</title>
+        <title>Toket NFT Generator</title>
       </Head>
       <div
         className="antialiased mx-auto px-4 py-20 h-100 bg-dark"
@@ -121,124 +128,99 @@ export default function Home() {
         <Toaster />
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-4xl tracking-tighter pb-10 font-bold text-white">
-            Toket & Dall-E AI NFT Generator
+            Toket NFT Generator
           </h1>
           <div className="w-full sm:w-[400px] relative">
             <Formik
               validationSchema={Yup.object(validationSchema())}
-              onSubmit={generateSubmit}
+              onSubmit={formSubmit}
               validateOnChange={false}
               initialValues={{
-                prompt: "",
+                file: null,
+                name: "",
+                description: "NFT auto generated usign Toket's API",
+                wallet: "",
               }}
             >
               {({
                 handleSubmit,
                 handleChange,
-                handleBlur,
+                setFieldValue,
                 values,
-                touched,
-                isValid,
                 errors,
               }) => (
                 <Form noValidate onSubmit={handleSubmit}>
                   <Row className="mb-3">
                     <Form.Group as={Col} md="12" controlId="validationFormik01">
                       <InputGroup hasValidation>
+                        <div className="relative flex w-full items-center justify-center mb-6">
+                          <div className="w-full sm:w-[400px] h-[400px] rounded-xl shadow-md relative bg-gray-700 overflow-hidden">
+                            {image ? (
+                              <Image
+                                alt={"Image uploaded by user"}
+                                className={cn(
+                                  "opacity-0 duration-1000 ease-in-out rounded-xl shadow-md h-full object-cover",
+                                  { "opacity-100": canShowImage }
+                                )}
+                                src={image}
+                                fill={true}
+                                onLoadingComplete={() => {
+                                  setCanShowImage(true);
+                                }}
+                              />
+                            ) : (
+                              <DropZone
+                                loading={loading}
+                                file={values.file}
+                                onUpload={(uploadedFile, url) => {
+                                  setFieldValue("file", uploadedFile);
+                                  setImage(url);
+                                }}
+                              />
+                            )}
+                          </div>
+                        </div>
+
+                        <Form.Control.Feedback type="invalid">
+                          {errors.file}
+                        </Form.Control.Feedback>
+
                         <Form.Control
+                          hidden={true}
                           type="text"
-                          placeholder="Prompt for DALL-E"
-                          name="prompt"
-                          value={values.prompt}
-                          onChange={handleChange}
-                          isInvalid={!!errors.prompt}
-                          disabled={showLoadingState || mintLoading}
+                          isInvalid={!!errors.file}
                         />
 
                         <Form.Control.Feedback type="invalid">
-                          {errors.prompt}
+                          {errors.file}
                         </Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
                   </Row>
 
-                  <Row className="mb-3">
-                    <div className="d-grid gap-2">
-                      <Button
-                        variant="primary"
-                        type="submit"
-                        disabled={loading || mintLoading}
-                      >
-                        {loading ? <Spinner size="sm" /> : "Generate"}
-                      </Button>
+                  <div className="relative flex w-full items-center justify-center">
+                    <div
+                      hidden={values.file == null}
+                      className="flex w-full sm:w-auto flex-col sm:flex-row"
+                    >
+                      <MintForm
+                        values={values}
+                        errors={errors}
+                        handleChange={handleChange}
+                        loading={mintLoading}
+                      />
                     </div>
-                  </Row>
+                  </div>
                 </Form>
               )}
             </Formik>
           </div>
 
-          {prompt && (
-            <div className="relative flex w-full items-center justify-center mb-6">
-              {image && (
-                <div className="w-full sm:w-[400px] h-[400px] rounded-xl shadow-md relative">
-                  <Image
-                    alt={`Dall-E representation of: ${prompt}`}
-                    className={cn(
-                      "opacity-0 duration-1000 ease-in-out rounded-xl shadow-md h-full object-cover",
-                      { "opacity-100": canShowImage }
-                    )}
-                    src={image}
-                    fill={true}
-                    onLoadingComplete={() => {
-                      setCanShowImage(true);
-                    }}
-                  />
-                </div>
-              )}
-
-              <div
-                className={cn(
-                  "w-full sm:w-[400px] absolute top-0.5 overflow-hidden rounded-xl bg-white/5 shadow-xl shadow-black/5",
-                  {
-                    "before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-gray-500/10 before:to-transparent":
-                      showLoadingState,
-                    "opacity-0 shadow-none": canShowImage,
-                  }
-                )}
-              >
-                <div
-                  className={cn(
-                    "w-full sm:w-[400px] h-[400px] bg-gray-200 rounded-xl shadow-md flex items-center justify-center"
-                  )}
-                >
-                  <p className="uppercase text-sm text-gray-400">
-                    {showLoadingState
-                      ? "Generating image...."
-                      : "No image selected"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {mintId ? (
+          {1 == 1 && (
             <PendingTransaction
               id={mintId ?? ""}
               transactionHash={transactionHash}
             />
-          ) : (
-            <div className="relative flex w-full items-center justify-center">
-              {image && !showLoadingState && (
-                // <div className="flex w-full sm:w-auto flex-col sm:flex-row">
-                <MintForm
-                  prompt={prompt}
-                  loading={mintLoading}
-                  onSubmit={mintNft}
-                />
-                // </div>
-              )}
-            </div>
           )}
         </div>
       </div>
@@ -249,12 +231,31 @@ export default function Home() {
 const TEXT_MIN_LENGTH = 10;
 function validationSchema() {
   return {
-    prompt: Yup.string()
+    file: Yup.mixed()
+      .required("Image is required")
+      .test(
+        "fileType",
+        "File must be of type jpeg or png",
+        (value) =>
+          value === null ||
+          (value instanceof File &&
+            (value.type === "image/jpeg" || value.type === "image/png"))
+      ),
+    name: Yup.string()
       .min(
         TEXT_MIN_LENGTH,
-        `Prompt must be at least ${TEXT_MIN_LENGTH} chareacters long`
+        `Name must be at least ${TEXT_MIN_LENGTH} chareacters long`
       )
-      .required("Prompt is required"),
+      .required("Name is required"),
+    description: Yup.string()
+      .min(
+        TEXT_MIN_LENGTH,
+        `Description must be at least ${TEXT_MIN_LENGTH} chareacters long`
+      )
+      .required("Description is required"),
+    wallet: Yup.string()
+      .required("Recipient address is required")
+      .matches(/^0x[a-fA-F0-9]{40}$/, "Please use a valid a address"),
   };
 }
 
