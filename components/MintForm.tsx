@@ -18,9 +18,7 @@ export default function MintForm(props: MintFormProps) {
 
   return (
     <div className="w-full sm:w-[400px] rounded-xl shadow-md relative bg-gray-700 text-white px-4 py-5">
-      <div style={styles.titleContainer}>
-        <h4>Setup your NFT</h4>
-      </div>
+      <h4 className="mb-3 font-bold text-white text-center">Setup your NFT</h4>
       <Row className="mb-3">
         <Form.Group as={Col} md="12" controlId="validationFormik01">
           <Form.Label>NFT Name</Form.Label>

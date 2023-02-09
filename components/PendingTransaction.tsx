@@ -1,59 +1,48 @@
-import cn from "classnames";
-import Head from "next/head";
-import Image from "next/image";
-import { useState } from "react";
-import { toast, Toaster } from "react-hot-toast";
-import * as Yup from "yup";
-import { Formik } from "formik";
-import Link from "next/link";
-
-import {
-  Alert,
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Row,
-  Spinner,
-} from "react-bootstrap";
-import { useInterval } from "../utils/use-interval";
-
-export type MintFormResult = {
-  name: string;
-  description: string;
-  wallet: string;
-};
+import { Button, Row, Spinner } from "react-bootstrap";
 
 export type PendingTransactionProps = {
   id: string;
   transactionHash: string;
+  tokenId: string;
 };
 
 export default function PendingTransaction(props: PendingTransactionProps) {
-  const { id, transactionHash } = props;
+  const { id, transactionHash, tokenId } = props;
 
   return (
     <div className="w-full sm:w-[400px] rounded-xl shadow-md relative bg-gray-700 text-white px-4 py-5">
-      <div style={styles.titleContainer}>
-        <h4>Mint Result</h4>
+      <div>
+        <h4 className="mb-3 font-bold text-white text-center">Mint Result</h4>
       </div>
 
       <Row className="mb-3">
-        <h5 style={styles.transactionHashTitle}>Mint ID</h5>
-        <p style={styles.transactionHashValue}>{id}</p>
+        <h6 className="text-l text-white">Mint ID</h6>
+        <h6 className="text-l text-white font-bold">{id}</h6>
       </Row>
 
       <Row className="mb-3">
-        <h5 style={styles.transactionHashTitle}>Transaction Hash</h5>
+        <h6 className="text-l text-white">Transaction Hash</h6>
 
         {transactionHash ? (
-          <p style={styles.transactionHashValue}>
+          <h6 className="text-l text-white font-bold">
             {`${transactionHash.substring(0, 10)}...${transactionHash.substring(
               transactionHash.length - 10
             )}`}
-          </p>
+          </h6>
+        ) : (
+          <div>
+            <Spinner size="sm" />
+          </div>
+        )}
+      </Row>
+
+      <Row className="mb-3">
+        <h6 className="text-l text-white">
+          {tokenId ? "Token ID" : "Token ID - Transaction pending"}
+        </h6>
+
+        {tokenId ? (
+          <h6 className="text-l text-white font-bold">{tokenId}</h6>
         ) : (
           <div>
             <Spinner size="sm" />
@@ -82,40 +71,3 @@ export default function PendingTransaction(props: PendingTransactionProps) {
     </div>
   );
 }
-
-const TEXT_MIN_LENGTH = 10;
-function validationSchema() {
-  return {
-    name: Yup.string()
-      .min(
-        TEXT_MIN_LENGTH,
-        `Name must be at least ${TEXT_MIN_LENGTH} chareacters long`
-      )
-      .required("Name is required"),
-    description: Yup.string()
-      .min(
-        TEXT_MIN_LENGTH,
-        `Description must be at least ${TEXT_MIN_LENGTH} chareacters long`
-      )
-      .required("Description is required"),
-    wallet: Yup.string()
-      .required("Wallet address is required")
-      .matches(/^0x[a-fA-F0-9]{40}$/, "Please use a valid a address"),
-  };
-}
-
-const styles = {
-  titleContainer: {
-    textAlign: "center",
-  },
-  buttonRow: {
-    // marginTop: 10,
-    display: "flex",
-    alignItems: "center",
-    padding: 0,
-    width: "100%",
-    justifyContent: "center",
-    // alignItems: "center",
-    // justifyContent: "center",
-  },
-};

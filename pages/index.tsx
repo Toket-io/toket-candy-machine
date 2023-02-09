@@ -19,6 +19,7 @@ export default function Home() {
   const [canShowImage, setCanShowImage] = useState(false);
   const [mintId, setMintId] = useState(null);
   const [transactionHash, setTransactionHash] = useState(null);
+  const [tokenId, setTokenId] = useState(null);
 
   useInterval(
     async () => {
@@ -29,12 +30,13 @@ export default function Home() {
         if (res.status === 200) {
           console.log("*AC fetched mint: ", json.transactionHash);
           setTransactionHash(json.transactionHash);
+          setTokenId(json.tokenId);
         }
       } catch (error) {
         toast.error("Something went wrong...", { position: "top-center" });
       }
     },
-    mintId && !transactionHash ? 1000 : null
+    mintId && (!transactionHash || !tokenId) ? 1000 : null
   );
 
   const formSubmit = async (formValue) => {
@@ -44,6 +46,7 @@ export default function Home() {
 
     // Reset mint state
     setTransactionHash(null);
+    setTokenId(null);
     setMintId(null);
 
     var safeUrl: string | undefined | null = uploadedImageUrl || null;
@@ -191,6 +194,7 @@ export default function Home() {
             <PendingTransaction
               id={mintId ?? ""}
               transactionHash={transactionHash}
+              tokenId={tokenId}
             />
           )}
         </div>
@@ -229,53 +233,3 @@ function validationSchema() {
       .matches(/^0x[a-fA-F0-9]{40}$/, "Please use a valid a address"),
   };
 }
-
-const styles = {
-  transactionHash: {
-    backgroundColor: "#292D32",
-    padding: "10px 30px",
-    borderRadius: 18,
-    display: "flex",
-    alignItems: "center",
-    width: "100%",
-    justifyContent: "space-between",
-  },
-  transactionHashMob: {
-    backgroundColor: "#292D32",
-    padding: 15,
-    borderRadius: 18,
-    display: "flex",
-    alignItems: "center",
-    width: "100%",
-    flexDirection: "column",
-    marginBottom: "40px",
-  },
-  transactionHashTexts: {
-    display: "flex",
-    flexDirection: "column",
-    textAlign: "left",
-    overflow: "hidden",
-  },
-  transactionHashTextsMob: {
-    display: "flex",
-    flexDirection: "column",
-    overflow: "hidden",
-    width: "90%",
-  },
-  transactionHashTitle: {
-    fontSize: "18px",
-    lineHeight: "24px",
-  },
-  transactionHashValue: {
-    fontSize: "18px",
-    fontWeight: 700,
-    lineHeight: "24px",
-    // overflow: "scroll",
-    // backgroundColor: "red",
-  },
-  pendingTransaction: {
-    backgroundColor: "white",
-    padding: 16,
-    borderRadius: 18,
-  },
-};
