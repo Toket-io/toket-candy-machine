@@ -1,4 +1,4 @@
-import { Button, Row, Spinner } from "react-bootstrap";
+import { Button, Row, Spinner, Col } from "react-bootstrap";
 
 export type PendingTransactionProps = {
   id: string;
@@ -21,53 +21,76 @@ export default function PendingTransaction(props: PendingTransactionProps) {
       </Row>
 
       <Row className="mb-3">
-        <h6 className="text-l text-white">Transaction Hash</h6>
+        <Col sm={8}>
+          <h6 className="text-l text-white">Transaction Hash</h6>
 
-        {transactionHash ? (
-          <h6 className="text-l text-white font-bold">
-            {`${transactionHash.substring(0, 10)}...${transactionHash.substring(
-              transactionHash.length - 10
-            )}`}
-          </h6>
-        ) : (
-          <div>
-            <Spinner size="sm" />
-          </div>
+          {transactionHash ? (
+            <h6 className="text-l text-white font-bold">
+              {`${transactionHash.substring(
+                0,
+                10
+              )}...${transactionHash.substring(transactionHash.length - 10)}`}
+            </h6>
+          ) : (
+            <div>
+              <Spinner size="sm" />
+            </div>
+          )}
+        </Col>
+        {transactionHash && (
+          <Col sm={4}>
+            <a
+              style={{
+                textDecoration: "none",
+                color: "white",
+              }}
+              className="d-grid gap-2"
+              target="_blank"
+              href={`https://mumbai.polygonscan.com/tx/${transactionHash}`}
+              rel="noopener noreferrer"
+            >
+              <Button size="sm" variant="secondary">
+                Open Polygonscan
+              </Button>
+            </a>
+          </Col>
         )}
       </Row>
 
       <Row className="mb-3">
-        <h6 className="text-l text-white">
-          {tokenId ? "Token ID" : "Token ID - Transaction pending"}
-        </h6>
+        <Col sm={8}>
+          <h6 className="text-l text-white">
+            {tokenId ? "Token ID" : "Transaction pending"}
+          </h6>
 
-        {tokenId ? (
-          <h6 className="text-l text-white font-bold">{tokenId}</h6>
-        ) : (
-          <div>
-            <Spinner size="sm" />
-          </div>
+          {tokenId ? (
+            <h6 className="text-l text-white font-bold">{tokenId}</h6>
+          ) : (
+            <div>
+              <Spinner size="sm" />
+            </div>
+          )}
+        </Col>
+
+        {tokenId && (
+          <Col sm={4}>
+            <a
+              style={{
+                textDecoration: "none",
+                color: "white",
+              }}
+              className="d-grid gap-2"
+              target="_blank"
+              href={`https://testnets.opensea.io/assets/mumbai/0x319fcf7f4ef48245319e0ee5bd29d01a5d1dd97b/${tokenId}`}
+              rel="noopener noreferrer"
+            >
+              <Button size="sm" variant="primary">
+                Open OpenSea
+              </Button>
+            </a>
+          </Col>
         )}
       </Row>
-
-      {transactionHash && (
-        <Row className="mb-3">
-          <a
-            style={{
-              textDecoration: "none",
-              color: "white",
-            }}
-            className="d-grid gap-2"
-            target="_blank"
-            href={`https://mumbai.polygonscan.com/tx/${transactionHash}`}
-            rel="noopener noreferrer"
-          >
-            <Button variant="primary" type="submit">
-              {!transactionHash ? <Spinner size="sm" /> : "Open Explorer"}
-            </Button>
-          </a>
-        </Row>
-      )}
     </div>
   );
 }
