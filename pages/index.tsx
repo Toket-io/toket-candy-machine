@@ -11,8 +11,10 @@ import MintForm, { MintFormResult } from "../components/MintForm";
 import PendingTransaction from "../components/PendingTransaction";
 import DropZone from "@/components/DropZone";
 import { firebaseUploadNewBytes } from "@/api/firebase";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
+  const { currentUser } = useAuth();
   const [image, setImage] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
   const [mintLoading, setMintLoading] = useState(false);
@@ -53,8 +55,9 @@ export default function Home() {
     try {
       if (!uploadedImageUrl) {
         toast("Uploading image...", { position: "top-center" });
+
         const imageUrl = await firebaseUploadNewBytes(
-          `images/${file.name}`,
+          `images/${currentUser.uid}-${file.name}`,
           file
         );
         safeUrl = imageUrl;
