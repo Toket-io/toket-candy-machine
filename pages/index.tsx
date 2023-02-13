@@ -30,7 +30,7 @@ export default function Home() {
         const json = await res.json();
 
         if (res.status === 200) {
-          console.log("fetched mint", json);
+          console.log("Refreshing mint data");
           setTransactionHash(json.transactionHash);
           setTokenId(json.tokenId);
         }
