@@ -1,7 +1,10 @@
 $theme-colors: (
-  "toket": #63D664
-);
-
+  "primary": #63D664,
+  "secondary": #63D664,
+  "danger": #ff4136,
+  "toket": #63D664,
+  );
+    
 // Import Bootstrap
 @import "~bootstrap/scss/bootstrap";
 

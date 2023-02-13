@@ -30,7 +30,7 @@ export default function Home() {
         const json = await res.json();
 
         if (res.status === 200) {
-          console.log("*AC fetched mint: ", json.transactionHash);
+          console.log("fetched mint", json);
           setTransactionHash(json.transactionHash);
           setTokenId(json.tokenId);
         }
@@ -88,7 +88,6 @@ export default function Home() {
         setMintId(json.id);
       }
     } catch (error) {
-      console.log("error: ", error);
       toast.error("Something went wrong...", { position: "top-center" });
     }
     setMintLoading(false);
@@ -131,7 +130,7 @@ export default function Home() {
                   <Row className="mb-3">
                     <Form.Group as={Col} md="12" controlId="validationFormik01">
                       <InputGroup hasValidation>
-                        <div className="relative flex w-full items-center justify-center mb-4">
+                        <div className="relative flex w-full items-center justify-center mb-0">
                           <div className="w-full sm:w-[400px] h-[400px] rounded-xl shadow-md relative bg-dark overflow-hidden border border-toket border-3">
                             {image ? (
                               <Image
