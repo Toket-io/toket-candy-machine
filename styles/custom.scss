@@ -1,7 +1,11 @@
+$theme-colors: (
+  "toket": #63D664
+);
+
 // Import Bootstrap
 @import "~bootstrap/scss/bootstrap";
 
 // // Override body background color to dark mode
 body {
-  background-color: $dark;
+  background-color: #0A0A0A;
 }

@@ -131,8 +131,8 @@ export default function Home() {
                   <Row className="mb-3">
                     <Form.Group as={Col} md="12" controlId="validationFormik01">
                       <InputGroup hasValidation>
-                        <div className="relative flex w-full items-center justify-center mb-6">
-                          <div className="w-full sm:w-[400px] h-[400px] rounded-xl shadow-md relative bg-gray-700 overflow-hidden">
+                        <div className="relative flex w-full items-center justify-center mb-4">
+                          <div className="w-full sm:w-[400px] h-[400px] rounded-xl shadow-md relative bg-dark overflow-hidden border border-toket border-3">
                             {image ? (
                               <Image
                                 alt={"Image uploaded by user"}
@@ -193,13 +193,16 @@ export default function Home() {
             </Formik>
           </div>
 
-          {mintId && (
+          <div
+            hidden={mintId == null}
+            className="relative flex w-full items-center justify-center mt-4"
+          >
             <PendingTransaction
               id={mintId ?? ""}
               transactionHash={transactionHash}
               tokenId={tokenId}
             />
-          )}
+          </div>
         </div>
       </div>
     </>

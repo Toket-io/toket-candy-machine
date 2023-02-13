@@ -10,7 +10,7 @@ export default function PendingTransaction(props: PendingTransactionProps) {
   const { id, transactionHash, tokenId } = props;
 
   return (
-    <div className="w-full sm:w-[400px] rounded-xl shadow-md relative bg-gray-700 text-white px-4 py-5">
+    <div className="w-full sm:w-[400px] rounded-xl shadow-md relative bg-dark text-white px-4 py-5 border border-toket border-3">
       <div>
         <h4 className="mb-3 font-bold text-white text-center">Mint Result</h4>
       </div>

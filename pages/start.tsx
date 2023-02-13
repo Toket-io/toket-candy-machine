@@ -31,7 +31,7 @@ const Login: NextPage = () => {
       <Container>
         <Row className="justify-content-center align-items-center px-3">
           <Col lg={8}>
-            <Row className="bg-gray-700 text-white d-flex align-items-center justify-content-center p-5 rounded-xl">
+            <Row className="bg-dark text-white d-flex align-items-center justify-content-center p-5 rounded-xl border border-toket border-3">
               <div className="text-center">
                 <h2>Welcome</h2>
                 <p>
