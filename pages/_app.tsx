@@ -1,13 +1,20 @@
-import "../styles/globals.css";
-import { Analytics } from "@vercel/analytics/react";
+import "@/styles/globals.css";
+import "@/styles/custom.scss";
+// import "bootstrap/dist/css/bootstrap.css";
+import type { AppProps } from "next/app";
+import { SSRProvider } from "react-bootstrap";
 
-function MyApp({ Component, pageProps }) {
+import AuthProvider from "../context/AuthContext";
+import ProtectedRoute from "../context/ProtectedRoute";
+
+export default function App({ Component, pageProps, router }: AppProps) {
   return (
-    <>
-      <Component {...pageProps} />;
-      <Analytics />
-    </>
+    <SSRProvider>
+      <AuthProvider>
+        <ProtectedRoute router={router}>
+          <Component {...pageProps} />
+        </ProtectedRoute>
+      </AuthProvider>
+    </SSRProvider>
   );
 }
-
-export default MyApp;

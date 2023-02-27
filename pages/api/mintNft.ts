@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-const QSTASH = `https://qstash.upstash.io/v1/publish/`;
-const DALL_E = "https://api.openai.com/v1/images/generations";
-const VERCEL_URL = "https://dalle-2.vercel.app";
+const TOKET_URL = "https://toket-public-gateway-3cpfdsl0.uc.gateway.dev/v0/easyMint";
 import rateLimit from "../../utils/rate-limit";
 
 const limiter = rateLimit({
@@ -13,7 +11,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { prompt } = req.query;
+  const { name, description, wallet, imageUrl } = req.body
+
   try {
     // Check if the user has exceeded maximum number of requests per minute
     await limiter.check(res, 5, "CACHE_TOKEN").catch((e) => {
@@ -24,22 +23,28 @@ export default async function handler(
         description: "The user has exceeded the maximum number of requests",
       });
     });
-    const response = await fetch(`${QSTASH + DALL_E}`, {
+
+    const body = {
+      "mintToAddress": wallet,
+      "name": name,
+      "description": description,
+      "imageUrl": imageUrl,
+    }
+
+    const response = await fetch(TOKET_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.QSTASH_TOKEN}`,
-        "upstash-forward-Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "x-public-key": process.env.TOKET_PUBLIC_KEY,
+        "x-api-key": process.env.TOKET_API_KEY,
         "Content-Type": "application/json",
-        "Upstash-Callback": `${VERCEL_URL}/api/callback`,
       },
-      body: JSON.stringify({
-        prompt,
-        n: 1,
-        size: "1024x1024",
-      }),
+      body: JSON.stringify(body),
     });
     const json = await response.json();
-    return res.status(202).json({ id: json.messageId });
+    console.log("*AC json response: ", json);
+
+    return res.status(200).json(json);
+
   } catch (error) {
     return res
       .status(500)
