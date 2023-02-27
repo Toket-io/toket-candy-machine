@@ -4,10 +4,11 @@ export type PendingTransactionProps = {
   id: string;
   transactionHash: string;
   tokenId: string;
+  contractAddress: string;
 };
 
 export default function PendingTransaction(props: PendingTransactionProps) {
-  const { id, transactionHash, tokenId } = props;
+  const { id, transactionHash, tokenId, contractAddress } = props;
 
   return (
     <div className="w-full sm:w-[400px] rounded-xl shadow-md relative bg-dark text-white px-4 py-5 border border-toket border-3">
@@ -81,7 +82,7 @@ export default function PendingTransaction(props: PendingTransactionProps) {
               }}
               className="d-grid gap-2"
               target="_blank"
-              href={`https://testnets.opensea.io/assets/mumbai/0x319fcf7f4ef48245319e0ee5bd29d01a5d1dd97b/${tokenId}`}
+              href={`https://testnets.opensea.io/assets/mumbai/${contractAddress}/${tokenId}`}
               rel="noopener noreferrer"
             >
               <Button size="sm" variant="primary">

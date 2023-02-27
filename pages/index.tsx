@@ -22,6 +22,7 @@ export default function Home() {
   const [mintId, setMintId] = useState(null);
   const [transactionHash, setTransactionHash] = useState(null);
   const [tokenId, setTokenId] = useState(null);
+  const [contractAddress, setContractAddress] = useState(null);
 
   useInterval(
     async () => {
@@ -31,6 +32,7 @@ export default function Home() {
 
         if (res.status === 200) {
           console.log("Refreshing mint data");
+          setContractAddress(json.contractAddress);
           setTransactionHash(json.transactionHash);
           setTokenId(json.tokenId);
         }
@@ -47,6 +49,7 @@ export default function Home() {
     setMintLoading(true);
 
     // Reset mint state
+    setContractAddress(null);
     setTransactionHash(null);
     setTokenId(null);
     setMintId(null);
@@ -200,6 +203,7 @@ export default function Home() {
               id={mintId ?? ""}
               transactionHash={transactionHash}
               tokenId={tokenId}
+              contractAddress={contractAddress}
             />
           </div>
         </div>
